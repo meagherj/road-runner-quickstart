@@ -111,9 +111,9 @@ public class CoachRobotAutoDriveToAprilTagOmni extends LinearOpMode
     final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  e.g. Ramp up to 37% power at a 25 degree Yaw error.   (0.375 / 25.0)
     final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  e.g. Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
 
-    final double MAX_AUTO_SPEED = 0.5;   //  Clip the approach speed to this max value (adjust for your robot)
-    final double MAX_AUTO_STRAFE= 0.5;   //  Clip the strafing speed to this max value (adjust for your robot)
-    final double MAX_AUTO_TURN  = 0.3;   //  Clip the turn speed to this max value (adjust for your robot)
+    final double MAX_AUTO_SPEED = 0.2;   //  Clip the approach speed to this max value (adjust for your robot)
+    final double MAX_AUTO_STRAFE= 0.2;   //  Clip the strafing speed to this max value (adjust for your robot)
+    final double MAX_AUTO_TURN  = 0.2;   //  Clip the turn speed to this max value (adjust for your robot)
 
     private DcMotor frontLeftDrive = null;  //  Used to control the left front drive wheel
     private DcMotor frontRightDrive = null;  //  Used to control the right front drive wheel
@@ -176,12 +176,12 @@ public class CoachRobotAutoDriveToAprilTagOmni extends LinearOpMode
 
             if (gamepad1.a){
                 DESIRED_DISTANCE = 175.0; //  this is how close the camera should get to the target (inches)
-                DESIRED_YAW = -25; // 25 degrees offset for back shot
+                DESIRED_YAW = -25; // -25 degrees offset for back shot
                 shooterSpeed = .58;
             }
             if (gamepad1.b){
                 DESIRED_DISTANCE = 200.0; //  this is how close the camera should get to the target (inches)
-                DESIRED_YAW = -5; // 25 degrees offset for back shot
+                DESIRED_YAW = -5; // -5 degrees offset for pickup
                 shooterSpeed = 0;
             }else{
                 DESIRED_DISTANCE = 90.0; //  this is how close the camera should get to the target (inches)
@@ -219,13 +219,13 @@ public class CoachRobotAutoDriveToAprilTagOmni extends LinearOpMode
             } else {
                 telemetry.addData("\n>","Drive using joysticks to find valid target\n");
             }
-            if (gamepad1.left_bumper){
+            if (gamepad1.right_trigger > 0.5){
                 servo.setPosition(0.7);
             }else{
                 servo.setPosition(0.5);
             }
             // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-            if (targetFound) {
+            if (targetFound && !gamepad1.left_bumper) {
 
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
                 double  rangeError      = (desiredTag.ftcPose.range - DESIRED_DISTANCE);
