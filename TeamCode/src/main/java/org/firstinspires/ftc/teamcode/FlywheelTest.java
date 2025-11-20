@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -115,6 +115,7 @@ public class FlywheelTest extends LinearOpMode {
 
         initAprilTag();
         shooter = new Shooter(hardwareMap, telemetry);
+        int DESIRED_TAG = 24;
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -132,9 +133,9 @@ public class FlywheelTest extends LinearOpMode {
                 if (detection.metadata != null) {
                     telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                     // Only use tags that don't have Obelisk in them
-                    if (!(detection.id == 24)) {
-                        telemetry.addData("ID24","Found");
-                        shooter.setRange(detection.ftcPose.range*2);
+                    if (detection.id == DESIRED_TAG) {
+                        telemetry.addData("TargetFound",DESIRED_TAG);
+                        shooter.setRange(detection.ftcPose.range);
                     }
                 } else {
                     telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
@@ -142,6 +143,11 @@ public class FlywheelTest extends LinearOpMode {
                 }
             }   // end for() loop
 
+            if (gamepad1.right_bumper){
+                shooter.spinClose();
+            }else{
+                shooter.stop();
+            }
             // Add "key" information to telemetry
             telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
             telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
@@ -156,6 +162,16 @@ public class FlywheelTest extends LinearOpMode {
             } else if (gamepad1.dpad_up) {
                 visionPortal.resumeStreaming();
             }
+            shooter.update();
+
+            telemetry.addData("SwitchTag", "D-Pad left or Right");
+            telemetry.addData("Current Tag", DESIRED_TAG);
+            if (gamepad1.dpadLeftWasPressed()){
+                DESIRED_TAG -= 1;
+            }
+            if (gamepad1.dpadRightWasPressed()){
+                DESIRED_TAG += 1;
+            }
 
             // Share the CPU.
             sleep(20);
@@ -163,7 +179,6 @@ public class FlywheelTest extends LinearOpMode {
 
         // Save more CPU resources when camera is no longer needed.
         visionPortal.close();
-
     }   // end method runOpMode()
 
     /**
@@ -198,7 +213,7 @@ public class FlywheelTest extends LinearOpMode {
         // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second (default)
         // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second (default)
         // Note: Decimation can be changed on-the-fly to adapt during a match.
-        //aprilTag.setDecimation(3);
+        aprilTag.setDecimation(2);
 
         // Create the vision portal by using a builder.
         VisionPortal.Builder builder = new VisionPortal.Builder();
